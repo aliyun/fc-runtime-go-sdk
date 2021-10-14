@@ -55,8 +55,6 @@ GOOS=linux CGO_ENABLED=0 go build main.go
 
 Golang 是编译型语言，需要在本地编译后直接上传可执行的二进制文件，在函数入口配置中，不同于 Python，NodeJS的 `[文件名].[函数名]` 格式，Golang 语言的函数入口可直接设置为 `[文件名]` ，该文件名是只编译后的二进制文件名称，当函数被调用时，函数计算平台会直接执行函数入口配置的文件名。
 
-
-
 在 Golang 的代码中，需要引入官方的 sdk 库 `github.com/aliyun/fc-runtime-go-sdk/fc`，并且，需要实现 `handler` 函数和 `main` 函数。
 
 ```
@@ -76,6 +74,29 @@ func main() {
 func HandleRequest(ctx context.Context, event string) (string, error) {
     fmt.Println("hello world")
     return "hello world", nil
+}
+```
+注意: event 类型为 string 时，传参必须是以双引号括起来的字符串。
+
+
+如果参数为 json，event 可定义为 struct 或 map, 比如：  
+```golang
+package main
+
+import (
+	"fmt"
+
+	"github.com/aliyun/fc-runtime-go-sdk/fc"
+)
+
+func main() {
+	fc.Start(HandleRequest)
+}
+
+func HandleRequest(event map[string]interface{}) (string, error) {
+	fmt.Printf("event: %v\n", event)
+	fmt.Println("hello world! 你好，世界!")
+	return "hello world! 你好，世界!", nil
 }
 ```
 
