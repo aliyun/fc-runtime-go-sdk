@@ -172,7 +172,6 @@ package main
 import (
     "context"
     "encoding/json"
-    "fmt"
     "log"
 
     "github.com/aliyun/fc-runtime-go-sdk/fc"
@@ -187,7 +186,8 @@ func echoContext(ctx context.Context) (string, error) {
     fctx, _ := fccontext.FromContext(ctx)
     log.Println(fctx.AccountId)
     log.Printf("%#v\n", fctx)
-   
+
+    res, _ := json.Marshal(fctx)
     return string(res), nil
 }
 ```
@@ -310,7 +310,7 @@ func main() {
 }
 
 func HandleHttpRequest(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
-    w.WriteHeader(http.Ok)
+    w.WriteHeader(http.StatusOK)
     w.Header().Add("Content-Type", "text/plain")
     w.Write([]byte("hello, world!\n"))
     return nil
