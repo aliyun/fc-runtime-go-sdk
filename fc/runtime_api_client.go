@@ -23,12 +23,11 @@ const (
 	headerSecurityToken   = "x-fc-security-token"
 
 	// Function info
-	headerFunctionType     = "x-fc-function-type"
-	headerFunctionName     = "x-fc-function-name"
-	headerFunctionHandler  = "x-fc-function-handler"
-	headerFunctionMemory   = "x-fc-function-memory"
-	headerFunctionTimeout  = "x-fc-function-timeout"
-	headerFunctionDeadline = "x-fc-function-deadline"
+	headerFunctionType    = "x-fc-function-type"
+	headerFunctionName    = "x-fc-function-name"
+	headerFunctionHandler = "x-fc-function-handler"
+	headerFunctionMemory  = "x-fc-function-memory"
+	headerFunctionTimeout = "x-fc-function-timeout"
 
 	// Service info
 	headerServiceName       = "x-fc-service-name"
@@ -46,7 +45,6 @@ const (
 	headerQualifier  = "x-fc-qualifier"
 	headerVersionId  = "x-fc-version-id"
 	headerRetryCount = "x-fc-retry-count"
-	headerClientIp   = "x-fc-client-ip"
 	contentTypeJSON  = "application/json"
 	apiVersion       = "2020-11-11"
 )
