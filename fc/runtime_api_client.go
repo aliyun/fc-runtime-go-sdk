@@ -35,6 +35,11 @@ const (
 	headerServiceLogproject = "x-fc-service-logproject"
 	headerServiceLogstore   = "x-fc-service-logstore"
 
+	// tracing info
+	headerOpenTracingSpanContext  = "x-fc-tracing-opentracing-span-context"
+	headerOpenTracingSpanBaggages = "x-fc-tracing-opentracing-span-baggages"
+	headerJaegerEndpoint          = "x-fc-tracing-jaeger-endpoint"
+
 	headerRegion     = "x-fc-region"
 	headerAccountId  = "x-fc-account-id"
 	headerHttpParams = "x-fc-http-params"
