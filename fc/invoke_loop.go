@@ -5,6 +5,7 @@ package fc
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -118,6 +119,17 @@ func convertInvokeRequest(invoke *invoke) (*messages.InvokeRequest, error) {
 		}
 	}
 
+	spanBaggages := make(map[string]string)
+	if base64SpanBaggages := invoke.headers.Get(headerOpenTracingSpanBaggages); base64SpanBaggages != "" {
+		spanBaggagesByte, err := base64.StdEncoding.DecodeString(base64SpanBaggages)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse contents of header %s: %s", headerOpenTracingSpanContext, base64SpanBaggages)
+		}
+		if err := json.Unmarshal(spanBaggagesByte, &spanBaggages); err != nil {
+			return nil, fmt.Errorf("failed to parse contents of header %s: %s", headerOpenTracingSpanContext, base64SpanBaggages)
+		}
+	}
+
 	res := &messages.InvokeRequest{
 		RequestId: invoke.id,
 		Deadline: messages.InvokeRequest_Timestamp{
@@ -144,6 +156,11 @@ func convertInvokeRequest(invoke *invoke) (*messages.InvokeRequest, error) {
 				LogStore:   invoke.headers.Get(headerServiceLogstore),
 				Qualifier:  invoke.headers.Get(headerQualifier),
 				VersionId:  invoke.headers.Get(headerVersionId),
+			},
+			Tracing: fccontext.Tracing{
+				OpenTracingSpanContext:  invoke.headers.Get(headerOpenTracingSpanContext),
+				OpenTracingSpanBaggages: spanBaggages,
+				JaegerEndpoint:          invoke.headers.Get(headerJaegerEndpoint),
 			},
 			Region:     invoke.headers.Get(headerRegion),
 			AccountId:  invoke.headers.Get(headerAccountId),

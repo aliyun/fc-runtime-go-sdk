@@ -38,7 +38,7 @@ type Service struct {
 // Tracing ...
 type Tracing struct {
 	OpenTracingSpanContext  string
-	OpenTracingSpanBaggages string
+	OpenTracingSpanBaggages map[string]string
 	JaegerEndpoint          string
 }
 
@@ -51,6 +51,7 @@ type FcContext struct {
 	Region      string
 	AccountId   string
 	RetryCount  int
+	Tracing     Tracing
 }
 
 // An unexported type to be used as the key for types in this package.
