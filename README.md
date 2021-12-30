@@ -1,7 +1,5 @@
 # Golang 入门
 
-Golang runtime 目前在内测阶段
-
 ## 背景信息
 
 函数计算目前支持以下 golang 1.x 版本，推荐使用 go1.8 及以上版本。
@@ -10,7 +8,10 @@ Golang runtime 目前在内测阶段
 
 #### golang sdk 和工具
 
-- golang runtime sdk : github.com/aliyun/fc-runtime-go-sdk
+函数计算目前提供以下 golang sdk 和工具
+- [FC SDK for Go](https://github.com/aliyun/FC-Runtime-Go-SDK/tree/master/fc): golang runtime 编程模型的具体实现，函数计算平台使用这个包运行您的handler
+- [github.com/aliyun/FC-Runtime-Go-SDK/fccontext](https://github.com/aliyun/FC-Runtime-Go-SDK/tree/master/fccontext): 访问context信息的辅助库
+- [github.com/aliyun/FC-Runtime-Go-SDK/examples](https://github.com/aliyun/FC-Runtime-Go-SDK/tree/master/examples): 使用golang runtime的简单示例
 
 ## 编译部署
 
@@ -20,17 +21,28 @@ Golang 语言不支持在线编辑，仅支持 .zip 方式，可以直接上传�
 
 #### 1. 在 Mac 或 Linux 下
 
-下载函数计算 golang sdk 库：
+1. 下载函数计算 golang sdk 库：
 
 ```
 github.com/aliyun/fc-runtime-go-sdk
 ```
 
-编译并打包
+2. 编译并打包
 
-```
-GOOS=linux go build main.go
+```bash
+GOOS=linux CGO_ENABLED=0 go build main.go
 zip function.zip main
+```
+
+设置 GOOS=linux，确保编译后的可执行文件与函数计算平台的 Go 运行系统环境兼容，尤其是在非 Linux 环境中编译时。
+在 Linux 下，建议使用纯静态编译，设置 CGO_ENABLED=0，确保可执行文件不依赖任何外部依赖库（如libc库），避免出现编译环境和 Go 运行时环境依赖库兼容问题。
+```bash
+GOOS=linux CGO_ENABLED=0 go build main.go
+```
+
+在 M1 Mac （或其他ARM架构的机器）下，还需要设置 GOARCH=amd64，实现跨平台交叉编译。
+```bash
+GOOS=linux GOARCH=amd64 go build main.go
 ```
 
 如果你的包里有多个文件
@@ -38,68 +50,64 @@ zip function.zip main
 ```
 GOOS=linux go build main
 ```
+## 函数入口
+Golang 是编译型语言，需要在本地编译后直接上传可执行的二进制文件，在函数入口配置中，不同于 Python，NodeJS的 `[文件名].[函数名]` 格式，Golang 语言的函数入口可直接设置为 `[文件名]`。
+该文件名是只编译后的二进制文件名称，当函数被调用时，函数计算平台会直接执行函数入口配置的文件名。
+比如，使用GOOS=linux CGO_ENABLED=0 go build main.go 编译出来的文件是 main， 那么在函数入口的配置里就可以填入 main 。
 
-在 Linux 下，可能需要设置 `**CGO_ENABLED=0**`
-
-```
-GOOS=linux CGO_ENABLED=0 go build main.go
-```
-
-#### 2. 在 Windows 下
-
-... 待完善
-
-
+> 注意，这里 main 文件必须在zip包的顶层，可以使用 unzip -l your.zip 命令查看压缩包的目录结构。
+> 如果想要调用压缩包中的 code/hello, 可以将函数入口设置为 code/hello
 
 # 事件函数
 
-Golang 是编译型语言，需要在本地编译后直接上传可执行的二进制文件，在函数入口配置中，不同于 Python，NodeJS的 `[文件名].[函数名]` 格式，Golang 语言的函数入口可直接设置为 `[文件名]` ，该文件名是只编译后的二进制文件名称，当函数被调用时，函数计算平台会直接执行函数入口配置的文件名。
 
 在 Golang 的代码中，需要引入官方的 sdk 库 `github.com/aliyun/fc-runtime-go-sdk/fc`，并且，需要实现 `handler` 函数和 `main` 函数。
 
-```
+```golang
 // hello_world.go
 package main
 
 import (
-    "fmt"
-    "context"
-    
-    "github.com/aliyun/fc-runtime-go-sdk/fc"
-)
-
-func main() {
-    fc.Start(HandleRequest)
-}
-
-func HandleRequest(ctx context.Context, event string) (string, error) {
-    fmt.Println("hello world")
-    return "hello world", nil
-}
-```
-注意: event 类型为 string 时，传参必须是以双引号括起来的字符串。
-
-
-如果参数为 json，event 可定义为 struct 或 map, 比如：  
-```golang
-package main
-
-import (
 	"fmt"
+    "context"
 
 	"github.com/aliyun/fc-runtime-go-sdk/fc"
 )
 
+type MyEvent struct {
+	Name string `json:"name"`
+}
+
+func HandleRequest(ctx context.Context, event MyEvent) (string, error) {
+    return fmt.Sprintf("你好，%s!", event.Name), nil
+}
+
 func main() {
 	fc.Start(HandleRequest)
 }
+```
+传入的 event 参数，一个包含 name 属性的 json 字符串
 
-func HandleRequest(event map[string]interface{}) (string, error) {
-	fmt.Printf("event: %v\n", event)
-	fmt.Println("hello world! 你好，世界!")
-	return "hello world! 你好，世界!", nil
+```json
+{
+  "name": "世界"
 }
 ```
+
+
+示例解析:
+- **package main**: 在 Golang 语言中， Go 应用程序都包含一个名为 `main` 的包
+- **import**: 需要引用函数计算依赖的包，主要包括
+  - **github.com/aliyun/fc-runtime-go-sdk/fc**: 函数计算 Golang 语言的核心库
+  - **context**：函数计算 Golang 语言的 Context 对象
+- **func HandleRequest(ctx context.Context, event map[string]interface{}) (string, error)** :  这个是程序的入口函数，里面包含将要执行的代码，参数含义如下：
+  - **ctx context.Context:** 提供了函数在调用时的运行信息，可以在 Handler 页面找到详细信息
+  - **event MyEvent**: 调用函数时传入的数据，可以是多种类型，具体支持格式可以见 Handler 页面
+  - **string, error**: 返回两个数据，字符串和错误信息
+  - **return fmt.Sprintf("hello world! 你好，%s !", event.Name), nil**: 简单的返回 Hello 信息，其中包含传入的 event。 nil 表示没有错误发生。
+- func main(): Golang 函数代码的入口，这个是必备的。
+
+通过添加代码 `fc.Start(HandleRequest)`，你的程序就可以在阿里云的函数计算平台运行了。
 
 ## Handler
 
@@ -232,9 +240,59 @@ func main() {
 }
 ```
 
-
-
 # HTTP 函数
+
+```golang
+package main
+
+import (
+	"context"
+	"fmt"
+	"net/http"
+    "io/ioutil"
+
+	"github.com/aliyun/fc-runtime-go-sdk/fc"
+)
+
+func HandleHttpRequest(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
+  body, err := ioutil.ReadAll(req.Body)
+  if err != nil {
+    w.WriteHeader(http.StatusBadRequest)
+    w.Header().Add("Content-Type", "text/plain")
+    w.Write([]byte(err.Error()))
+    return nil
+  }
+	w.WriteHeader(http.StatusOK)
+	w.Header().Add("Content-Type", "text/plain")
+	w.Write([]byte(fmt.Sprintf("你好，%s!\n", body)))
+	return nil
+}
+
+func main() {
+	fc.StartHttp(HandleHttpRequest)
+}
+```
+
+示例解析（有更新）：
+
+- **package main**: 在 Golang 语言中， Go 应用程序都包含一个名为 `main` 的包
+- **import**: 需要引用函数计算依赖的包，主要包括
+  - **github.com/aliyun/fc-runtime-go-sdk/fc**: 函数计算 Golang 语言的核心库
+  - **context**：函数计算 Golang 语言的 Context 对象
+  - **net/http**： HTTP 函数中需要用到的 http 包中的 Request 和 ResponseWriter 接口
+- **HandleHttpRequest(ctx context.Context, w http.ResponseWriter, req \*http.Request) error**:  这个是程序的入口函数，里面包含将要执行的代码，参数含义如下：
+  - **ctx context.Context:** 提供了函数在调用时的运行信息，可以在 Handler 页面找到详细信息
+  - **w http.ResponseWriter**: HTTP 函数的响应（responses）接口，可以设置状态行(status code)，消息报头(headers) 和 响应正文(body)，具体支持格式可以见 xxx 页面（根据实际情况填写）
+  - **req \*http.Request**: HTTP 函数的请求（request) 接口，包含请求行（request line），请求头部（header）和请求数据（body），具体方法见xxx（根据实际情况填写）
+  - **w.WriteHeader(http.StatusOK)**: 填入响应的 HTTP 状态码
+  - **w.Header().Add("Content-Type", "text/plain")**： 填入响应的消息报头(headers)
+  - **w.Write([]byte(fmt.Sprintf("你好，%s!\n", body)))**： 填入响应的消息体（body）
+  - **return nil**: 简单的错误信息，nil 表示没有错误发生，如果设置了错误信息，则认为是函数错误，具体方法见 Error（根据实际情况填写）
+- func main(): Golang 函数代码的入口，这个是必备的。
+
+是通过 `fc.StartHttp(HandleHttpRequest)`，你的程序就可以在阿里云的函数计算平台运行了。
+
+注意： http 函数和事件函数调用的方法不同，事件函数： `fc.Start()`， http 函数： `fc.StartHttp` 。
 
 ## HTTP 函数定义
 
