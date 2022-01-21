@@ -1,4 +1,4 @@
-# Golang 入门
+# 阿里云函数计算 Golang 入门
 
 ## 背景信息
 
@@ -47,9 +47,10 @@ GOOS=linux GOARCH=amd64 go build main.go
 
 如果你的包里有多个文件
 
-```
+```bash
 GOOS=linux go build main
 ```
+
 ## 函数入口
 Golang 是编译型语言，需要在本地编译后直接上传可执行的二进制文件，在函数入口配置中，不同于 Python，NodeJS的 `[文件名].[函数名]` 格式，Golang 语言的函数入口可直接设置为 `[文件名]`。
 该文件名是只编译后的二进制文件名称，当函数被调用时，函数计算平台会直接执行函数入口配置的文件名。
@@ -69,7 +70,7 @@ package main
 
 import (
 	"fmt"
-    "context"
+    	"context"
 
 	"github.com/aliyun/fc-runtime-go-sdk/fc"
 )
@@ -79,7 +80,7 @@ type MyEvent struct {
 }
 
 func HandleRequest(ctx context.Context, event MyEvent) (string, error) {
-    return fmt.Sprintf("你好，%s!", event.Name), nil
+	return fmt.Sprintf("你好，%s!", event.Name), nil
 }
 
 func main() {
@@ -124,16 +125,16 @@ handler 函数里包含了要执行的代码，主要包括：
 
 Handler 支持的格式如下：
 
-```
- func ()
- func () error
- func (TIn) error
- func () (TOut, error)
- func (TIn) (TOut, error)
- func (context.Context) error
- func (context.Context, TIn) error
- func (context.Context) (TOut, error)
- func (context.Context, TIn) (TOut, error)
+```golang
+func ()
+func () error
+func (TIn) error
+func () (TOut, error)
+func (TIn) (TOut, error)
+func (context.Context) error
+func (context.Context, TIn) error
+func (context.Context) (TOut, error)
+func (context.Context, TIn) (TOut, error)
 ```
 
 其中 TIn 和 TOut 与 `encoding/json` 标准库兼容。
@@ -175,7 +176,7 @@ context 提供了以下参数
 
 然后，需要 `import github.com/aliyun/fc-runtime-go-sdk/fccontext`, 通过 `fccontext.FromContext`方法获取 `fccontext`。
 
-```
+```golang
 package main
 
 import (
@@ -203,7 +204,7 @@ func echoContext(ctx context.Context) (string, error) {
 
 下面的示例展示了如何使用 `deadline` 获取函数剩余执行时间。
 
-```
+```golang
 package main
 
 import (
@@ -212,7 +213,7 @@ import (
 	"log"
 	"time"
     
-    "github.com/aliyun/fc-runtime-go-sdk/fc"
+	"github.com/aliyun/fc-runtime-go-sdk/fc"
 )
 
 func LongRunningHandler(ctx context.Context) (string, error) {
@@ -249,19 +250,20 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-    "io/ioutil"
+	"io/ioutil"
 
 	"github.com/aliyun/fc-runtime-go-sdk/fc"
 )
 
 func HandleHttpRequest(ctx context.Context, w http.ResponseWriter, req *http.Request) error {
-  body, err := ioutil.ReadAll(req.Body)
-  if err != nil {
-    w.WriteHeader(http.StatusBadRequest)
-    w.Header().Add("Content-Type", "text/plain")
-    w.Write([]byte(err.Error()))
-    return nil
-  }
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Add("Content-Type", "text/plain")
+		w.Write([]byte(err.Error()))
+		return nil
+	}
+	
 	w.WriteHeader(http.StatusOK)
 	w.Header().Add("Content-Type", "text/plain")
 	w.Write([]byte(fmt.Sprintf("你好，%s!\n", body)))
@@ -300,7 +302,7 @@ Golang 的 HTTP 函数定义参考 Golang 标准库 http 中的 [Handler interfa
 
 
 
-```
+```golang
 function(ctx context.Context, w http.ResponseWriter, req *http.Request) error
 ```
 
@@ -331,7 +333,7 @@ http.Request 是Golang 标准库 http 中的定义，目前支持的参数和方
 
 实现了 http.ResponseWriter 声明的三个方法
 
-```
+```golang
 type ResponseWriter interface {
 	Header() Header
 	Write([]byte) (int, error)
@@ -354,7 +356,7 @@ type ResponseWriter interface {
 
 ## 使用示例
 
-```
+```golang
 package main
 
 import (
@@ -394,7 +396,7 @@ Initializer函数是实例的初始化函数，保证同一实例**成功且仅�
 
 函数定义，只有一个 context 参数，使用方法和事件函数一样
 
-```
+```golang
 function(ctx context.Context)
 ```
 
@@ -409,7 +411,7 @@ function(ctx context.Context)
 
 示例
 
-```
+```golang
 package main
 
 import (
