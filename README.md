@@ -51,6 +51,21 @@ GOOS=linux GOARCH=amd64 go build main.go
 GOOS=linux go build main
 ```
 
+#### 2. 在 Windows 下
+
+1. 下载 build-fc-zip 工具
+```bash
+go.exe get -u github.com/aliyun/fc-runtime-go-sdk/cmd/build-fc-zip
+```
+
+2. 使用 `build-fc-zip` 工具创建 `.zip` 文件。如果你默认安装了 Go，工具默认会在 `%USERPROFILE%\Go\bin.`
+
+```bash
+set GOOS=linux
+go build -o main main.go
+%USERPROFILE%\Go\bin\build-fc-zip.exe -output main.zip main
+```
+
 ## 函数入口
 Golang 是编译型语言，需要在本地编译后直接上传可执行的二进制文件，在函数入口配置中，不同于 Python，NodeJS的 `[文件名].[函数名]` 格式，Golang 语言的函数入口可直接设置为 `[文件名]`。
 该文件名是只编译后的二进制文件名称，当函数被调用时，函数计算平台会直接执行函数入口配置的文件名。
