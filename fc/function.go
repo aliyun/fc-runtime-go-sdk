@@ -21,8 +21,8 @@ const (
 	// function type, do not modify!!
 	handleFunction      functionType = 0
 	initializerFunction functionType = 1
-	preFreezeFunction   functionType = 2
-	preStopFunction     functionType = 3
+	preStopFunction     functionType = 2
+	preFreezeFunction   functionType = 3
 
 	// base function type
 	eventFunction functionType = 101
@@ -55,7 +55,7 @@ func NewFunction(handler interface{}, funcType functionType) *Function {
 	return f
 }
 
-// RegistryLifeCycleHandler
+// RegistryLifeCycleHandler ...
 func (fn *Function) RegistryLifeCycleHandler(lifeCycleHandlers []handlerWrapper) {
 	for _, item := range lifeCycleHandlers {
 		switch item.funcType {
@@ -96,12 +96,12 @@ func (fn *Function) Invoke(req *messages.InvokeRequest, response *messages.Invok
 	lc := &req.Context
 	lc.RequestID = req.RequestId
 	invokeContext = fccontext.NewContext(invokeContext, lc)
-
+	fn.printStartLog(invokeFuncType, req.RequestId)
 	if invokeFuncType == initializerFunction {
 		if fn.initializeHandler == nil {
 			fn.initializeHandler = errorLifeCycleHandler(errors.New("no initializer handler registered"))
 		}
-		fn.printStartLog(invokeFuncType, req.RequestId)
+
 		fn.initializeHandler.Invoke(invokeContext)
 		return nil
 	}
@@ -119,10 +119,10 @@ func (fn *Function) Invoke(req *messages.InvokeRequest, response *messages.Invok
 			fn.preStopHandler = errorLifeCycleHandler(errors.New("no prestop handler registered"))
 		}
 		fn.preStopHandler.Invoke(invokeContext)
+		response.Payload = []byte{}
 		return nil
 	}
 
-	fn.printStartLog(invokeFuncType, req.RequestId)
 	if fn.funcType == eventFunction {
 		return fn.invokeEventFunc(invokeContext, req.Payload, response)
 	}
@@ -148,12 +148,12 @@ func (fn *Function) invokeHttpFunc(invokeContext context.Context, httpParams *st
 		response.Error = fcErrorResponse(err)
 		return nil
 	}
-	respPayload, err := resp.Payload()
+	response.Payload = resp.Body()
+	response.HttpParam, err = resp.HttpParam()
 	if err != nil {
 		response.Error = fcErrorResponse(err)
 		return nil
 	}
-	response.Payload = respPayload
 	return nil
 }
 
@@ -199,27 +199,32 @@ func (fn *Function) printPanicLog(requestId, errorMessage string) {
 }
 
 func (fn *Function) printEndLog(funcType functionType, requestId string, isHandled bool) {
-	if !enableInvokePanicLog {
-		return
-	}
 	suffix := ""
 	if !isHandled {
 		suffix = ", Error: Unhandled function error"
 	}
-	if funcType == initializerFunction {
+
+	switch funcType {
+	case initializerFunction:
 		fmt.Printf("FC Initialize End RequestId: %s%s\n", requestId, suffix)
-	} else {
+	case preStopFunction:
+		fmt.Printf("FC PreStop End RequestId: %s%s\n", requestId, suffix)
+	case preFreezeFunction:
+		fmt.Printf("FC PreFreeze End RequestId: %s%s\n", requestId, suffix)
+	default:
 		fmt.Printf("FC Invoke End RequestId: %s%s\n", requestId, suffix)
 	}
 }
 
 func (fn *Function) printStartLog(funcType functionType, requestId string) {
-	if !enableInvokePanicLog {
-		return
-	}
-	if funcType == initializerFunction {
+	switch funcType {
+	case initializerFunction:
 		fmt.Printf("FC Initialize Start RequestId: %s\n", requestId)
-	} else {
+	case preStopFunction:
+		fmt.Printf("FC PreStop Start RequestId: %s\n", requestId)
+	case preFreezeFunction:
+		fmt.Printf("FC PreFreeze Start RequestId: %s\n", requestId)
+	default:
 		fmt.Printf("FC Invoke Start RequestId: %s\n", requestId)
 	}
 }

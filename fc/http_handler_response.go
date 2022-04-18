@@ -68,6 +68,7 @@ func (r *fcResponse) responseParams() (string, error) {
 	return encoded, nil
 }
 
+// Deprecated: Use Body and HttpParam instead
 func (r *fcResponse) Payload() ([]byte, error) {
 	respHeaders := map[string]string{}
 	for key, values := range r.header {
@@ -88,4 +89,18 @@ func (r *fcResponse) Payload() ([]byte, error) {
 		"isBase64Encoded": true,
 	}
 	return json.Marshal(resp)
+}
+
+func (r *fcResponse) Body() []byte {
+	body := r.body.Bytes()
+	r.body.Reset()
+	return body
+}
+
+func (r *fcResponse) HttpParam() (string, error)  {
+	encodedHttpParams, err := r.responseParams()
+	if err != nil {
+		return "", err
+	}
+	return encodedHttpParams, nil
 }

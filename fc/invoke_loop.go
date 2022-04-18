@@ -37,30 +37,32 @@ func startRuntimeAPILoop(ctx context.Context, api string, baseHandler handlerWra
 	function := NewFunction(baseHandler.handler, baseHandler.funcType).withContext(ctx)
 	function.RegistryLifeCycleHandler(lifeCycleHandlers)
 	for {
-		invoke, err := client.next()
+		req, err := client.next()
 		if err != nil {
 			logPrintf("failed to get invoke request due to %v", err)
 			continue
 		}
-		err = handleInvoke(invoke, function)
-		if err != nil {
-			logPrintf("failed to invoke function due to %v", err)
-		}
+		go func(req *invoke, f *Function) {
+			err = handleInvoke(req, function)
+			if err != nil {
+				logPrintf("failed to invoke function due to %v", err)
+			}
+		}(req, function)
 	}
 }
 
 // handleInvoke returns an error if the function panics, or some other non-recoverable error occurred
-func handleInvoke(invoke *invoke, function *Function) error {
-	functionRequest, err := convertInvokeRequest(invoke)
+func handleInvoke(invokeInstance *invoke, function *Function) error {
+	functionRequest, err := convertInvokeRequest(invokeInstance)
 	if err != nil {
 		return fmt.Errorf("unexpected error occurred when parsing the invoke: %v", err)
 	}
 
 	functionResponse := &messages.InvokeResponse{}
-	ivkErr := function.Invoke(functionRequest, functionResponse, convertInvokeFunctionType(invoke))
+	ivkErr := function.Invoke(functionRequest, functionResponse, convertInvokeFunctionType(invokeInstance))
 	if functionResponse.Error != nil {
 		payload := safeMarshal(functionResponse.Error)
-		if err := invoke.failure(payload, contentTypeJSON); err != nil {
+		if err := invokeInstance.failure(payload, contentTypeJSON); err != nil {
 			return fmt.Errorf("unexpected error occurred when sending the function error to the API: %v", err)
 		}
 		if functionResponse.Error.ShouldExit {
@@ -72,15 +74,14 @@ func handleInvoke(invoke *invoke, function *Function) error {
 		return ivkErr
 	}
 
-	if err := invoke.success(functionResponse.Payload, contentTypeJSON); err != nil {
+	if err := invokeInstance.success(functionResponse.Payload, contentTypeJSON, functionResponse.HttpParam); err != nil {
 		return fmt.Errorf("unexpected error occurred when sending the function functionResponse to the API: %v", err)
 	}
-
 	return nil
 }
 
-func convertInvokeFunctionType(invoke *invoke) functionType {
-	funcType, err := strconv.ParseInt(invoke.headers.Get(headerFunctionType), 10, 64)
+func convertInvokeFunctionType(invokeInstance *invoke) functionType {
+	funcType, err := strconv.ParseInt(invokeInstance.headers.Get(headerFunctionType), 10, 64)
 	if err != nil {
 		return handleFunction
 	}
@@ -98,21 +99,21 @@ func convertInvokeFunctionType(invoke *invoke) functionType {
 }
 
 // convertInvokeRequest converts an invoke from the Runtime API, and unpacks it to be compatible with the shape of a `lambda.Function` InvokeRequest.
-func convertInvokeRequest(invoke *invoke) (*messages.InvokeRequest, error) {
-	deadlineEpochMS, err := strconv.ParseInt(invoke.headers.Get(headerDeadlineMS), 10, 64)
+func convertInvokeRequest(invokeInstance *invoke) (*messages.InvokeRequest, error) {
+	deadlineEpochMS, err := strconv.ParseInt(invokeInstance.headers.Get(headerDeadlineMS), 10, 64)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse contents of header: %s", headerDeadlineMS)
 	}
 	deadlineS := deadlineEpochMS / msPerS
 	deadlineNS := (deadlineEpochMS % msPerS) * nsPerMS
 
-	functionTimeoutSec, err := strconv.Atoi(invoke.headers.Get(headerFunctionTimeout))
+	functionTimeoutSec, err := strconv.Atoi(invokeInstance.headers.Get(headerFunctionTimeout))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse contents of header: %s", headerFunctionTimeout)
 	}
 
 	retryCount := 0
-	if retryCountStr := invoke.headers.Get(headerRetryCount); retryCountStr != "" {
+	if retryCountStr := invokeInstance.headers.Get(headerRetryCount); retryCountStr != "" {
 		retryCount, err = strconv.Atoi(retryCountStr)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse contents of header: %s", headerFunctionTimeout)
@@ -120,7 +121,7 @@ func convertInvokeRequest(invoke *invoke) (*messages.InvokeRequest, error) {
 	}
 
 	spanBaggages := make(map[string]string)
-	if base64SpanBaggages := invoke.headers.Get(headerOpenTracingSpanBaggages); base64SpanBaggages != "" {
+	if base64SpanBaggages := invokeInstance.headers.Get(headerOpenTracingSpanBaggages); base64SpanBaggages != "" {
 		spanBaggagesByte, err := base64.StdEncoding.DecodeString(base64SpanBaggages)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse contents of header %s: %s", headerOpenTracingSpanContext, base64SpanBaggages)
@@ -131,44 +132,44 @@ func convertInvokeRequest(invoke *invoke) (*messages.InvokeRequest, error) {
 	}
 
 	res := &messages.InvokeRequest{
-		RequestId: invoke.id,
+		RequestId: invokeInstance.id,
 		Deadline: messages.InvokeRequest_Timestamp{
 			Seconds: deadlineS,
 			Nanos:   deadlineNS,
 		},
-		Payload: invoke.payload,
+		Payload: invokeInstance.payload,
 		Context: fccontext.FcContext{
-			RequestID: invoke.id,
+			RequestID: invokeInstance.id,
 			Credentials: fccontext.Credentials{
-				AccessKeyId:     invoke.headers.Get(headerAccessKeyId),
-				AccessKeySecret: invoke.headers.Get(headerAccessKeySecret),
-				SecurityToken:   invoke.headers.Get(headerSecurityToken),
+				AccessKeyId:     invokeInstance.headers.Get(headerAccessKeyId),
+				AccessKeySecret: invokeInstance.headers.Get(headerAccessKeySecret),
+				SecurityToken:   invokeInstance.headers.Get(headerSecurityToken),
 			},
 			Function: fccontext.Function{
-				Name:    invoke.headers.Get(headerFunctionName),
-				Handler: invoke.headers.Get(headerFunctionHandler),
-				Memory:  invoke.headers.Get(headerFunctionMemory),
+				Name:    invokeInstance.headers.Get(headerFunctionName),
+				Handler: invokeInstance.headers.Get(headerFunctionHandler),
+				Memory:  invokeInstance.headers.Get(headerFunctionMemory),
 				Timeout: functionTimeoutSec,
 			},
 			Service: fccontext.Service{
-				Name:       invoke.headers.Get(headerServiceName),
-				LogProject: invoke.headers.Get(headerServiceLogproject),
-				LogStore:   invoke.headers.Get(headerServiceLogstore),
-				Qualifier:  invoke.headers.Get(headerQualifier),
-				VersionId:  invoke.headers.Get(headerVersionId),
+				Name:       invokeInstance.headers.Get(headerServiceName),
+				LogProject: invokeInstance.headers.Get(headerServiceLogproject),
+				LogStore:   invokeInstance.headers.Get(headerServiceLogstore),
+				Qualifier:  invokeInstance.headers.Get(headerQualifier),
+				VersionId:  invokeInstance.headers.Get(headerVersionId),
 			},
 			Tracing: fccontext.Tracing{
-				OpenTracingSpanContext:  invoke.headers.Get(headerOpenTracingSpanContext),
+				OpenTracingSpanContext:  invokeInstance.headers.Get(headerOpenTracingSpanContext),
 				OpenTracingSpanBaggages: spanBaggages,
-				JaegerEndpoint:          invoke.headers.Get(headerJaegerEndpoint),
+				JaegerEndpoint:          invokeInstance.headers.Get(headerJaegerEndpoint),
 			},
-			Region:     invoke.headers.Get(headerRegion),
-			AccountId:  invoke.headers.Get(headerAccountId),
+			Region:     invokeInstance.headers.Get(headerRegion),
+			AccountId:  invokeInstance.headers.Get(headerAccountId),
 			RetryCount: retryCount,
 		},
 	}
 
-	if httpParams := invoke.headers.Get(headerHttpParams); httpParams != "" {
+	if httpParams := invokeInstance.headers.Get(headerHttpParams); httpParams != "" {
 		res.HttpParams = &httpParams
 	}
 

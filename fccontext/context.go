@@ -52,6 +52,12 @@ type FcContext struct {
 	AccountId   string
 	RetryCount  int
 	Tracing     Tracing
+
+	logger 		*FcLogger
+}
+
+func (f *FcContext) GetLogger() *FcLogger {
+	return f.logger
 }
 
 // An unexported type to be used as the key for types in this package.
@@ -71,5 +77,6 @@ func NewContext(parent context.Context, lc *FcContext) context.Context {
 // FromContext returns the LambdaContext value stored in ctx, if any.
 func FromContext(ctx context.Context) (*FcContext, bool) {
 	lc, ok := ctx.Value(contextKey).(*FcContext)
+	lc.logger = NewFcLogger(lc.RequestID)
 	return lc, ok
 }
