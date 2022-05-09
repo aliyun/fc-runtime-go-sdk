@@ -33,6 +33,9 @@ type InvokeRequest struct {
 type InvokeResponse struct {
 	Payload []byte
 	Error   *InvokeResponse_Error
+
+	// HttpHandler parameter
+	HttpParam string
 }
 
 type InvokeResponse_Error struct {

@@ -59,12 +59,12 @@ func RegisterInitializerFunction(handler interface{}) {
 
 // RegisterPreFreezeFunction ...
 func RegisterPreFreezeFunction(handler interface{}) {
-	registerLifeCycleHandler(handler, initializerFunction)
+	registerLifeCycleHandler(handler, preFreezeFunction)
 }
 
 // RegisterPreStopFunction ...
 func RegisterPreStopFunction(handler interface{}) {
-	registerLifeCycleHandler(handler, initializerFunction)
+	registerLifeCycleHandler(handler, preStopFunction)
 }
 
 // StartWithContext is the same as Start except sets the base context for the function.
