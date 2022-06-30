@@ -6,4 +6,5 @@
 
 [OSS 事件格式](https://github.com/aliyun/fc-runtime-go-sdk/blob/master/events/README_OSS.md)
 
+
 [SLS 事件格式](https://github.com/aliyun/fc-runtime-go-sdk/blob/master/events/README_SLS.md)
