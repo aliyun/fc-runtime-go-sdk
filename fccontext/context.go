@@ -53,7 +53,7 @@ type FcContext struct {
 	RetryCount  int
 	Tracing     Tracing
 
-	logger 		*FcLogger
+	logger *FcLogger
 }
 
 func (f *FcContext) GetLogger() *FcLogger {
@@ -77,6 +77,9 @@ func NewContext(parent context.Context, lc *FcContext) context.Context {
 // FromContext returns the LambdaContext value stored in ctx, if any.
 func FromContext(ctx context.Context) (*FcContext, bool) {
 	lc, ok := ctx.Value(contextKey).(*FcContext)
+	if !ok {
+		return nil, false
+	}
 	lc.logger = NewFcLogger(lc.RequestID)
 	return lc, ok
 }
