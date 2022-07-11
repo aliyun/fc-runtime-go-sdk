@@ -54,7 +54,6 @@ type runtimeAPIClient struct {
 	baseURL    string
 	userAgent  string
 	httpClient *http.Client
-	buffer     *bytes.Buffer
 }
 
 func newRuntimeAPIClient(address string) *runtimeAPIClient {
@@ -63,7 +62,7 @@ func newRuntimeAPIClient(address string) *runtimeAPIClient {
 	}
 	endpoint := "http://" + address + "/" + apiVersion + "/runtime/invocation/"
 	userAgent := "aliyun-fc-go/" + runtime.Version()
-	return &runtimeAPIClient{endpoint, userAgent, client, bytes.NewBuffer(nil)}
+	return &runtimeAPIClient{endpoint, userAgent, client}
 }
 
 type invoke struct {
@@ -121,15 +120,15 @@ func (c *runtimeAPIClient) next() (*invoke, error) {
 		return nil, fmt.Errorf("failed to GET %s: got unexpected status code: %d", url, resp.StatusCode)
 	}
 
-	c.buffer.Reset()
-	_, err = c.buffer.ReadFrom(resp.Body)
+	payload := new(bytes.Buffer)
+	_, err = payload.ReadFrom(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read the invoke payload: %v", err)
 	}
 
 	return &invoke{
 		id:      resp.Header.Get(headerFCRequestID),
-		payload: c.buffer.Bytes(),
+		payload: payload.Bytes(),
 		headers: resp.Header,
 		client:  c,
 	}, nil
