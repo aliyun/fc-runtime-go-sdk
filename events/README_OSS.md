@@ -60,7 +60,7 @@ import (
 	"github.com/aliyun/fc-runtime-go-sdk/events"
 )
 
-func HandleRequest(ctx context.Context, event OssEvent) (string, error) {
+func HandleRequest(ctx context.Context, event events.OssEvent) (string, error) {
 	fmt.Printf("hello,the name of your bucket is %s", *event.Events[0].Oss.Bucket.Name)
 	return fmt.Sprintf("hello,The size of the object you are manipulating is %dB",*event.Events[0].Oss.Object.Size), nil
 }

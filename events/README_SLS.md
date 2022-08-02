@@ -35,7 +35,7 @@ import (
 	"github.com/aliyun/fc-runtime-go-sdk/events"
 )
 
-func HandleRequest(ctx context.Context, event SlsEvent) (string, error) {
+func HandleRequest(ctx context.Context, event events.SlsEvent) (string, error) {
 	fmt.Printf("hello,the name of your logstoreName is %s", *event.Source.LogstoreName)
 	return fmt.Sprintf("hello,the name of your projectName is %s",*event.Source.ProjectName), nil
 }

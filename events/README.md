@@ -8,3 +8,7 @@
 
 
 [SLS 事件格式](https://github.com/aliyun/fc-runtime-go-sdk/blob/master/events/README_SLS.md)
+
+[MNS Topic 事件格式](https://github.com/aliyun/fc-runtime-go-sdk/blob/master/events/README_MNS_Topic.md)
+
+[SLS Queue 事件格式](https://github.com/aliyun/fc-runtime-go-sdk/blob/master/events/README_MNS_Queue.md)
