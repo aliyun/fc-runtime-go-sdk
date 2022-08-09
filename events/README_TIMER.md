@@ -21,7 +21,18 @@
 下面展示了一个简单的 FC demo，当你为该函数配置定时器触发器之后，根据定时规则就会触发该函数，并返回消息内容。
 
 ```go
-func HandleRequest(ctx context.Context, event TimerEvent) (string, error) {
+package main
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/aliyun/fc-runtime-go-sdk/fc"
+	"github.com/aliyun/fc-runtime-go-sdk/fccontext"
+	"github.com/aliyun/fc-runtime-go-sdk/events"
+)
+
+func HandleRequest(ctx context.Context, event events.TimerEvent) (string, error) {
 	fctx, ok := fccontext.FromContext(ctx)
 	if !ok {
 		return "Get fccontext fail.", nil

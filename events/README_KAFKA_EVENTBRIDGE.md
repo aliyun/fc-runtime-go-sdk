@@ -28,6 +28,7 @@ import (
 
 	"github.com/aliyun/fc-runtime-go-sdk/fc"
 	"github.com/aliyun/fc-runtime-go-sdk/fccontext"
+	"github.com/aliyun/fc-runtime-go-sdk/events"
 )
 
 func HandleRequest(ctx context.Context, event []string) (string, error) {
@@ -38,7 +39,7 @@ func HandleRequest(ctx context.Context, event []string) (string, error) {
 	flog := fctx.GetLogger()
 
 	for _, eventString := range event {
-		var evt KafkaEventBridgeEvent
+		var evt events.KafkaEventBridgeEvent
 		err := json.Unmarshal([]byte(eventString), &evt)
 		if err != nil {
 			return "Unmarshal event fail.", err
