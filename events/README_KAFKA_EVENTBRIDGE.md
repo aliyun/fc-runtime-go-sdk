@@ -53,6 +53,9 @@ func HandleRequest(ctx context.Context, event []string) (string, error) {
 
 	return fmt.Sprintf("Receive Kafka Trigger Event: %v", event), nil
 }
+func main() {
+	fc.Start(HandleRequest)
+}
 
 ```
 
