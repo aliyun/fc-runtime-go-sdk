@@ -114,8 +114,13 @@ func NewHandler(handlerFunc interface{}) Handler {
 			} else {
 				event := reflect.New(eventType)
 
+				if eventType == reflect.TypeOf("") && len(payload) > 2 && payload[0] != '"' && payload[len(payload)-1] != '"' {
+					payload = addQuota(payload, '"')
+				}
+
 				if err := json.Unmarshal(payload, event.Interface()); err != nil {
-					return nil, err
+					return nil, fmt.Errorf("fail to unmarshal request data to '%s' type, error: %v, event: '%s'",
+						eventType, err, string(subByteArray(payload, 1024)))
 				}
 				// if nil != trace.RequestEvent {
 				// 	trace.RequestEvent(ctx, event.Elem().Interface())
@@ -144,4 +149,16 @@ func NewHandler(handlerFunc interface{}) Handler {
 
 		return val, err
 	})
+}
+
+func subByteArray(data []byte, byteSize int) []byte {
+	if len(data) <= byteSize {
+		return data
+	}
+	return data[:byteSize]
+}
+
+func addQuota(buf []byte, quota byte) []byte {
+	buf = append([]byte{quota}, buf...)
+	return append(buf, quota)
 }
