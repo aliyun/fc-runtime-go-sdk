@@ -109,15 +109,19 @@ func NewHandler(handlerFunc interface{}) Handler {
 		}
 		if (handlerType.NumIn() == 1 && !takesContext) || handlerType.NumIn() == 2 {
 			eventType := handlerType.In(handlerType.NumIn() - 1)
-			event := reflect.New(eventType)
+			if eventType == reflect.TypeOf([]byte{}) {
+				args = append(args, reflect.ValueOf(payload))
+			} else {
+				event := reflect.New(eventType)
 
-			if err := json.Unmarshal(payload, event.Interface()); err != nil {
-				return nil, err
+				if err := json.Unmarshal(payload, event.Interface()); err != nil {
+					return nil, err
+				}
+				// if nil != trace.RequestEvent {
+				// 	trace.RequestEvent(ctx, event.Elem().Interface())
+				// }
+				args = append(args, event.Elem())
 			}
-			// if nil != trace.RequestEvent {
-			// 	trace.RequestEvent(ctx, event.Elem().Interface())
-			// }
-			args = append(args, event.Elem())
 		}
 
 		response := handler.Call(args)
