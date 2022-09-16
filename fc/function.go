@@ -85,6 +85,9 @@ func (fn *Function) Invoke(req *messages.InvokeRequest, response *messages.Invok
 			fn.printPanicLog(req.RequestId, response.Error.ToJson())
 			fn.printEndLog(invokeFuncType, req.RequestId, false)
 			err = fmt.Errorf("%v", e)
+		} else if response.Error != nil {
+			fn.printPanicLog(req.RequestId, response.Error.ToJson())
+			fn.printEndLog(invokeFuncType, req.RequestId, false)
 		} else {
 			fn.printEndLog(invokeFuncType, req.RequestId, true)
 		}
