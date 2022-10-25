@@ -38,7 +38,6 @@ import (
 // See https://golang.org/pkg/encoding/json/#Unmarshal for how deserialization behaves
 func Start(handler interface{}) {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
-	log.Println("start")
 	StartWithContext(context.Background(), handler, eventFunction)
 }
 
@@ -48,7 +47,6 @@ func Start(handler interface{}) {
 // func (context.Context, http.ResponseWriter, *http.Request) error
 func StartHttp(handler interface{}) {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
-	log.Println("start http")
 	StartWithContext(context.Background(), handler, httpFunction)
 }
 
