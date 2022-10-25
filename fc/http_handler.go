@@ -137,6 +137,7 @@ func genHttpRequest(httpParams string, payload []byte) (*http.Request, error) {
 		return nil, err
 	}
 	req.URL.Path = params.Path
+	req.URL.Host = params.Host
 	req.RemoteAddr = params.ClientIP
 	req.Host = params.ClientIP
 	req.Header = params.HeadersMap
