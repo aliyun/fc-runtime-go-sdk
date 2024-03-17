@@ -6,3 +6,6 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+/modules.xml
+/fc-runtime-go-sdk.iml
+/vcs.xml
