@@ -44,57 +44,37 @@ type EventStruct struct {
 	Oss struct {
 		// Events 是一个包含多个事件的切片。每个事件都包含了关于OSS事件的详细信息。
 		Events []struct {
-			// EventName 事件名称。
-			EventName string `json:"eventName"`
-			// EventSource 事件来源。
-			EventSource string `json:"eventSource"`
-			// EventTime 事件发生的时间。
-			EventTime time.Time `json:"eventTime"`
-			// EventVersion 事件版本。
-			EventVersion string `json:"eventVersion"`
-			// Oss 包含了关于OSS事件的具体信息。
-			Oss struct {
-				// Bucket 包含了关于发生事件的存储桶的信息。
-				Bucket struct {
-					// Arn 存储桶的ARN（Amazon Resource Name）。
-					Arn string `json:"arn"`
-					// Name 存储桶的名称。
-					Name string `json:"name"`
-					// OwnerIdentity 存储桶所有者的身份信息。
-					OwnerIdentity string `json:"ownerIdentity"`
+			EventName    string    `json:"eventName"`    // EventName 事件名称。
+			EventSource  string    `json:"eventSource"`  // EventSource 事件来源。
+			EventTime    time.Time `json:"eventTime"`    // EventTime 事件发生的时间。
+			EventVersion string    `json:"eventVersion"` // EventVersion 事件版本。
+			Oss          struct {  // Oss 包含了关于OSS事件的具体信息。
+				Bucket struct { // Bucket 包含了关于发生事件的存储桶的信息。
+					Arn           string `json:"arn"`           // Arn 存储桶的ARN（Amazon Resource Name）。
+					Name          string `json:"name"`          // Name 存储桶的名称。
+					OwnerIdentity string `json:"ownerIdentity"` // OwnerIdentity 存储桶所有者的身份信息。
 				} `json:"bucket"`
-				// Object 包含了关于事件涉及的对象的信息。
-				Object struct {
-					// DeltaSize 对象的增量大小。
-					DeltaSize int `json:"deltaSize"`
-					// ETag 对象的ETag，用于标识对象的内容。
-					ETag string `json:"eTag"`
-					// Key 对象的键。
-					Key string `json:"key"`
-					// Size 对象的大小。
-					Size int `json:"size"`
+
+				Object struct { // Object 包含了关于事件涉及的对象的信息。
+					DeltaSize int    `json:"deltaSize"` // DeltaSize 对象的增量大小。
+					ETag      string `json:"eTag"`      // ETag 对象的ETag，用于标识对象的内容。
+					Key       string `json:"key"`       // Key 对象的键。
+					Size      int    `json:"size"`      // Size 对象的大小。
 				} `json:"object"`
-				// OssSchemaVersion OSS事件模式的版本。
-				OssSchemaVersion string `json:"ossSchemaVersion"`
-				// RuleId 触发此事件的规则ID。
-				RuleId string `json:"ruleId"`
+				OssSchemaVersion string `json:"ossSchemaVersion"` // OssSchemaVersion OSS事件模式的版本。
+				RuleId           string `json:"ruleId"`           // RuleId 触发此事件的规则ID。
 			} `json:"oss"`
-			// Region 事件发生的区域。
-			Region string `json:"region"`
-			// RequestParameters 包含了请求参数的信息。
-			RequestParameters struct {
-				// SourceIPAddress 请求的源IP地址。
-				SourceIPAddress string `json:"sourceIPAddress"`
+			Region            string   `json:"region"` // Region 事件发生的区域。
+			RequestParameters struct { // RequestParameters 包含了请求参数的信息。
+				SourceIPAddress string `json:"sourceIPAddress"` // SourceIPAddress 请求的源IP地址。
 			} `json:"requestParameters"`
-			// ResponseElements 包含了响应元素的信息，如请求ID。
-			ResponseElements struct {
-				// RequestId 请求的ID。
-				RequestId string `json:"requestId"`
+
+			ResponseElements struct { // ResponseElements 包含了响应元素的信息，如请求ID。
+				RequestId string `json:"requestId"` // RequestId 请求的ID。
 			} `json:"responseElements"`
-			// UserIdentity 包含了发起此事件的用户身份信息。
-			UserIdentity struct {
-				// PrincipalId 用户的主要ID。
-				PrincipalId string `json:"principalId"`
+
+			UserIdentity struct { // UserIdentity 包含了发起此事件的用户身份信息。
+				PrincipalId string `json:"principalId"` // PrincipalId 用户的主要ID。
 			} `json:"userIdentity"`
 		} `json:"events"`
 	}
@@ -194,53 +174,33 @@ type EventStruct struct {
 	// TableStore 结构体定义了表格存储相关的事件信息。
 	// 它包含了版本信息和记录集。
 	TableStore struct {
-		// Version 表示表格存储的版本信息。
-		Version string `json:"Version"`
-		// Records 是一个记录集合，包含了多条记录。
-		Records []struct {
-			// Type 表示记录的类型。
-			Type string `json:"Type"`
-			// Info 包含了记录的详细信息，例如时间戳。
-			Info struct {
-				// Timestamp 表示记录的创建或更新时间戳。
-				Timestamp int64 `json:"Timestamp"`
+		Version string     `json:"Version"` // Version 表示表格存储的版本信息。
+		Records []struct { // Records 是一个记录集合，包含了多条记录。
+			Type string   `json:"Type"` // Type 表示记录的类型。
+			Info struct { // Info 包含了记录的详细信息，例如时间戳。
+				Timestamp int64 `json:"Timestamp"` // Timestamp 表示记录的创建或更新时间戳。
 			} `json:"Info"`
-			// PrimaryKey 包含了记录的主键信息，包括列名和值。
-			PrimaryKey []struct {
-				// ColumnName 表示主键列的名称。
-				ColumnName string `json:"ColumnName"`
-				// Value 表示主键列的值。
-				Value interface{} `json:"Value"`
+			PrimaryKey []struct { // PrimaryKey 包含了记录的主键信息，包括列名和值。
+				ColumnName string      `json:"ColumnName"` // ColumnName 表示主键列的名称。
+				Value      interface{} `json:"Value"`      // Value 表示主键列的值。
 			} `json:"PrimaryKey"`
-			// Columns 包含了记录的所有列信息，包括列名、值和时间戳。
-			Columns []struct {
-				// Type 表示列的类型。
-				Type string `json:"Type"`
-				// ColumnName 表示列的名称。
-				ColumnName string `json:"ColumnName"`
-				// Value 表示列的值。
-				Value interface{} `json:"Value"`
-				// Timestamp 表示列值的修改时间戳。
-				Timestamp int64 `json:"Timestamp"`
+			Columns []struct { // Columns 包含了记录的所有列信息，包括列名、值和时间戳。
+				Type       string      `json:"Type"`       // Type 表示列的类型。
+				ColumnName string      `json:"ColumnName"` // ColumnName 表示列的名称。
+				Value      interface{} `json:"Value"`      // Value 表示列的值。
+				Timestamp  int64       `json:"Timestamp"`  // Timestamp 表示列值的修改时间戳。
 			} `json:"Columns"`
 		} `json:"Records"`
 	}
 	// Mns 结构体定义了与消息服务（MNS）相关的主题和队列配置。
 	Mns struct {
-		// Theme 结构体包含有关主题的消息格式定义。
-		Theme struct {
-			// Stream 结构体定义了流式消息的属性。
-			Stream struct {
-				// NoAttribute 为无属性消息提供字段。
-				NoAttribute string
-				// Attribute 结构体包含消息的属性。
-				Attribute struct {
-					// Body 存储消息的正文内容。
-					Body string `json:"body"`
-					// Attrs 结构体包含消息的额外属性。
-					Attrs struct {
-						// Extend 存储扩展属性信息。
-						Extend string `json:"Extend"`
+		Theme struct { // Theme 结构体包含有关主题的消息格式定义。
+			Stream struct { // Stream 结构体定义了流式消息的属性。
+				NoAttribute string   // NoAttribute 为无属性消息提供字段。
+				Attribute   struct { // Attribute 结构体包含消息的属性。
+					Body  string   `json:"body"` // Body 存储消息的正文内容。
+					Attrs struct { // Attrs 结构体包含消息的额外属性。
+						Extend string `json:"Extend"` // Extend 存储扩展属性信息。
 					} `json:"attrs"`
 				}
 			}
@@ -447,14 +407,10 @@ type EventStruct struct {
 						FieldPosition  int    `json:"fieldPosition"`
 					} `json:"topic"`
 				} `json:"nameIndex"`
-				// SchemaId 为模式的唯一标识
-				SchemaId string `json:"schemaId"`
-				// DatabaseName 指明了数据库名称
-				DatabaseName string `json:"databaseName"`
-				// TableName 指明了表名称
-				TableName string `json:"tableName"`
-				// PrimaryIndexInfo 包含了主索引的详细信息
-				PrimaryIndexInfo struct {
+				SchemaId         string   `json:"schemaId"`     // SchemaId 为模式的唯一标识
+				DatabaseName     string   `json:"databaseName"` // DatabaseName 指明了数据库名称
+				TableName        string   `json:"tableName"`    // TableName 指明了表名称
+				PrimaryIndexInfo struct { // PrimaryIndexInfo 包含了主索引的详细信息
 					IndexType   string `json:"indexType"`
 					IndexFields []struct {
 						FieldName      string `json:"fieldName"`
