@@ -8,35 +8,35 @@ import (
 
 type logWriter struct {
 	requestID string
-	level string
+	level     string
 }
 
 func (writer logWriter) Write(bytes []byte) (int, error) {
-	return fmt.Print(time.Now().UTC().Format("2006-01-02T15:04:05.999Z") + " " + writer.requestID + " ["+ writer.level + "] " + string(bytes))
+	return fmt.Print(time.Now().UTC().Format("2006-01-02T15:04:05.999Z") + " " + writer.requestID + " [" + writer.level + "] " + string(bytes))
 }
 
 func newLogWriter(requestID, level string) *logWriter {
 	return &logWriter{
 		requestID: requestID,
-		level: level,
+		level:     level,
 	}
 }
 
 // FcLogger ...
 type FcLogger struct {
 	debugLogger *log.Logger
-	infoLogger *log.Logger
-	warnLogger *log.Logger
+	infoLogger  *log.Logger
+	warnLogger  *log.Logger
 	errorLogger *log.Logger
 }
 
 // NewFcLogger ...
 func NewFcLogger(requestID string) *FcLogger {
 	return &FcLogger{
-		debugLogger:    log.New(newLogWriter(requestID, "DEBUG"), "", log.Lshortfile),
-		infoLogger:    log.New(newLogWriter(requestID, "INFO"), "", log.Lshortfile),
-		warnLogger:    log.New(newLogWriter(requestID, "WARN"), "", log.Lshortfile),
-		errorLogger:    log.New(newLogWriter(requestID, "ERROR"), "", log.Lshortfile),
+		debugLogger: log.New(newLogWriter(requestID, "DEBUG"), "", log.Lshortfile),
+		infoLogger:  log.New(newLogWriter(requestID, "INFO"), "", log.Lshortfile),
+		warnLogger:  log.New(newLogWriter(requestID, "WARN"), "", log.Lshortfile),
+		errorLogger: log.New(newLogWriter(requestID, "ERROR"), "", log.Lshortfile),
 	}
 }
 
@@ -79,4 +79,3 @@ func (l *FcLogger) Error(v ...interface{}) {
 func (l *FcLogger) Errorf(format string, v ...interface{}) {
 	l.errorLogger.Output(2, fmt.Sprintf(format, v...))
 }
-
