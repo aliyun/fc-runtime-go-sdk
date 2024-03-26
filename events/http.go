@@ -4,12 +4,12 @@ import "time"
 
 // HttpRequest 事件输入
 type HttpRequest struct {
-	Version         *string         `json:"version"`         // HTTP版本
-	RawPath         *string         `json:"rawPath"`         // 未经解析的路径
-	Body            *string         `json:"body"`            // 请求体
-	IsBase64Encoded *bool           `json:"isBase64Encoded"` // 请求体是否以Base64编码
-	Headers         *map[string]any `json:"headers"`         // HTTP请求头
-	QueryParameters *map[string]any `json:"queryParameters"` // 查询参数
+	Version         *string                 `json:"version"`         // HTTP版本
+	RawPath         *string                 `json:"rawPath"`         // 未经解析的路径
+	Body            *string                 `json:"body"`            // 请求体
+	IsBase64Encoded *bool                   `json:"isBase64Encoded"` // 请求体是否以Base64编码
+	Headers         *map[string]interface{} `json:"headers"`         // HTTP请求头
+	QueryParameters *map[string]interface{} `json:"queryParameters"` // 查询参数
 	// RequestContext 包含请求的上下文信息
 	RequestContext RequestContext `json:"requestContext"`
 }
@@ -35,8 +35,8 @@ type RequestContext struct {
 // HttpRepose 定义了HTTP响应的结构体
 // 主要包括状态码、头部信息、是否以Base64编码、响应体四个部分
 type HttpRepose struct {
-	StatusCode      *int            `json:"statusCode"`
-	Headers         *map[string]any `json:"headers"`
-	IsBase64Encoded *bool           `json:"isBase64Encoded"`
-	Body            *string         `json:"body"`
+	StatusCode      *int                    `json:"statusCode"`
+	Headers         *map[string]interface{} `json:"headers"`
+	IsBase64Encoded *bool                   `json:"isBase64Encoded"`
+	Body            *string                 `json:"body"`
 }
