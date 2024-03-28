@@ -12,11 +12,12 @@ func main() {
 
 /*
 event:
-{
-    "key1": "value1",
-    "key2": "value2",
-    "key3": "value3"
-}
+
+	{
+	    "key1": "value1",
+	    "key2": "value2",
+	    "key3": "value3"
+	}
 */
 func HandleRequest(event map[string]interface{}) (string, error) {
 	fmt.Printf("event: %v\n", event)

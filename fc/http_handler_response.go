@@ -97,7 +97,7 @@ func (r *fcResponse) Body() []byte {
 	return body
 }
 
-func (r *fcResponse) HttpParam() (string, error)  {
+func (r *fcResponse) HttpParam() (string, error) {
 	encodedHttpParams, err := r.responseParams()
 	if err != nil {
 		return "", err

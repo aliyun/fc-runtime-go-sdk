@@ -15,24 +15,24 @@ import (
 //
 // Rules:
 //
-// 	* handler must be a function
-// 	* handler may take between 0 and two arguments.
-// 	* if there are two arguments, the first argument must satisfy the "context.Context" interface.
-// 	* handler may return between 0 and two arguments.
-// 	* if there are two return values, the second argument must be an error.
-// 	* if there is one return value it must be an error.
+//   - handler must be a function
+//   - handler may take between 0 and two arguments.
+//   - if there are two arguments, the first argument must satisfy the "context.Context" interface.
+//   - handler may return between 0 and two arguments.
+//   - if there are two return values, the second argument must be an error.
+//   - if there is one return value it must be an error.
 //
 // Valid function signatures:
 //
-// 	func ()
-// 	func () error
-// 	func (TIn) error
-// 	func () (TOut, error)
-// 	func (TIn) (TOut, error)
-// 	func (context.Context) error
-// 	func (context.Context, TIn) error
-// 	func (context.Context) (TOut, error)
-// 	func (context.Context, TIn) (TOut, error)
+//	func ()
+//	func () error
+//	func (TIn) error
+//	func () (TOut, error)
+//	func (TIn) (TOut, error)
+//	func (context.Context) error
+//	func (context.Context, TIn) error
+//	func (context.Context) (TOut, error)
+//	func (context.Context, TIn) (TOut, error)
 //
 // Where "TIn" and "TOut" are types compatible with the "encoding/json" standard library.
 // See https://golang.org/pkg/encoding/json/#Unmarshal for how deserialization behaves
@@ -75,7 +75,7 @@ func StartWithContext(ctx context.Context, handler interface{}, funcType functio
 //
 // Handler implementation requires a single "Invoke()" function:
 //
-//  func Invoke(context.Context, []byte) ([]byte, error)
+//	func Invoke(context.Context, []byte) ([]byte, error)
 func StartHandler(handler Handler) {
 	StartHandlerWithContext(context.Background(), handler, eventFunction)
 }
@@ -108,7 +108,7 @@ var (
 //
 // Handler implementation requires a single "Invoke()" function:
 //
-//  func Invoke(context.Context, []byte) ([]byte, error)
+//	func Invoke(context.Context, []byte) ([]byte, error)
 func StartHandlerWithContext(ctx context.Context, handler interface{}, funcType functionType) {
 	startFunction := runtimeAPIStartFunction
 	config := os.Getenv(startFunction.env)
