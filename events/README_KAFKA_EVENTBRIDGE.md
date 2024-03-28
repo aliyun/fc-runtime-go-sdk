@@ -25,10 +25,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	
-	"github.com/aliyun/fc-runtime-go-sdk/events"
+
 	"github.com/aliyun/fc-runtime-go-sdk/fc"
 	"github.com/aliyun/fc-runtime-go-sdk/fccontext"
+	"github.com/aliyun/fc-runtime-go-sdk/events"
 )
 
 func HandleRequest(ctx context.Context, event []string) (string, error) {
@@ -37,7 +37,7 @@ func HandleRequest(ctx context.Context, event []string) (string, error) {
 		return "Get fccontext fail.", nil
 	}
 	flog := fctx.GetLogger()
-	
+
 	for _, eventString := range event {
 		var evt events.KafkaEventBridgeEvent
 		err := json.Unmarshal([]byte(eventString), &evt)
@@ -45,12 +45,12 @@ func HandleRequest(ctx context.Context, event []string) (string, error) {
 			return "Unmarshal event fail.", err
 		}
 		flog.Info("kafka event:", event)
-		
+
 		// The trigger event data is in the `Data` json object from the json array
 		flog.Info("kafka topic:", evt.Data.Topic)
 		flog.Info("kafka messgae:", evt.Data.Value)
 	}
-	
+
 	return fmt.Sprintf("Receive Kafka Trigger Event: %v", event), nil
 }
 func main() {

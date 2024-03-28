@@ -6,12 +6,12 @@
 package example
 // HttpRequest 考虑到1.18前不支持map[string]any，所以使用map[string]interface{}代替，可以视为等效。
 type HttpRequest struct {
-	Version         *string                 `json:"version"`         // HTTP版本
+	Version         *string                 `json:"version"`         // HTTP 触发器请求事件版本
 	RawPath         *string                 `json:"rawPath"`         // 未经解析的路径
 	Body            *string                 `json:"body"`            // 请求体
 	IsBase64Encoded *bool                   `json:"isBase64Encoded"` // 请求体是否以 Base64 编码
-	Headers         *map[string]interface{} `json:"headers"`         // HTTP请求头，以键值对存储
-	QueryParameters *map[string]interface{} `json:"queryParameters"` // 查询参数，以键值对存储
+	Headers         *map[string]string      `json:"headers"`         // HTTP 请求头，以键值对存储
+	QueryParameters *map[string]string      `json:"queryParameters"` // 查询参数，以键值对存储
 	// RequestContext 包含请求的上下文信息
 	RequestContext RequestContext `json:"requestContext"`
 }
