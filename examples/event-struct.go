@@ -16,10 +16,10 @@ func main() {
 }
 
 /*
-{
-    "Name": "hello world",
-    "Age": 100
-}
+	{
+	    "Name": "hello world",
+	    "Age": 100
+	}
 */
 func HandleRequest(event People) (string, error) {
 	fmt.Printf("event: %v\n", event)
