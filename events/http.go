@@ -1,7 +1,5 @@
 package events
 
-import "time"
-
 // HTTPTriggerEvent 事件输入
 type HTTPTriggerEvent struct {
 	Version         *string            `json:"version"`         // HTTP 触发器请求事件版本
@@ -27,16 +25,16 @@ type HTTPTriggerRequestContext struct {
 		SourceIp  *string `json:"sourceIp"`  // 请求来源 IP
 		UserAgent *string `json:"userAgent"` // 客户端标识，如: Mozilla/5.0
 	} `json:"http"`
-	RequestId *string    `json:"requestId"` // 请求 ID
-	Time      *time.Time `json:"time"`      // 请求时间
-	TimeEpoch *string    `json:"timeEpoch"` // 时间戳（epoch 时间）
+	RequestId *string `json:"requestId"` // 请求 ID
+	Time      *string `json:"time"`      // 请求时间
+	TimeEpoch *string `json:"timeEpoch"` // 时间戳（epoch 时间）
 }
 
 // HTTPTriggerResponse 定义了 HTTP 响应的结构体
 // 主要包括状态码、头部信息、是否以 Base64 编码、响应体四个部分
 type HTTPTriggerResponse struct {
-	StatusCode      *int                    `json:"statusCode"`
-	Headers         *map[string]interface{} `json:"headers"`
-	IsBase64Encoded *bool                   `json:"isBase64Encoded"`
-	Body            *string                 `json:"body"`
+	StatusCode      int               `json:"statusCode"`
+	Headers         map[string]string `json:"headers"`
+	IsBase64Encoded bool              `json:"isBase64Encoded"`
+	Body            string            `json:"body"`
 }
