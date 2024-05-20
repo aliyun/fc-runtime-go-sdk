@@ -43,7 +43,7 @@ func startRuntimeAPILoop(ctx context.Context, api string, baseHandler handlerWra
 			continue
 		}
 		go func(req *invoke, f *Function) {
-			err = handleInvoke(req, function)
+			err = handleInvoke(req, f)
 			if err != nil {
 				logPrintf("failed to invoke function due to %v", err)
 			}
