@@ -75,8 +75,8 @@ func (receiver HTTPTriggerResponse) SetStatusCode(StatusCode int) error {
 	receiver.StatusCode = StatusCode
 	return nil
 }
-func (receiver HTTPTriggerResponse) SetHeader(Header string) {
-	receiver.Headers[Header] = Header
+func (receiver HTTPTriggerResponse) SetHeader(name string, value string) {
+	receiver.Headers[name] = value
 }
 func (receiver HTTPTriggerResponse) WriteBody(context interface{}) error {
 	val := reflect.ValueOf(context)
