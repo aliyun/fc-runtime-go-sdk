@@ -68,17 +68,17 @@ func (receiver HTTPTriggerEvent) ReadHeader(name string) (context string, err er
 	}
 	return context, nil
 }
-func (receiver HTTPTriggerResponse) SetStatusCode(StatusCode int) error {
+func (receiver *HTTPTriggerResponse) SetStatusCode(StatusCode int) error {
 	if StatusCode < 100 || StatusCode > 599 {
 		return errors.New("invalid status code")
 	}
 	receiver.StatusCode = StatusCode
 	return nil
 }
-func (receiver HTTPTriggerResponse) SetHeader(name string, value string) {
+func (receiver *HTTPTriggerResponse) SetHeader(name string, value string) {
 	receiver.Headers[name] = value
 }
-func (receiver HTTPTriggerResponse) WriteBody(context interface{}) error {
+func (receiver *HTTPTriggerResponse) WriteBody(context interface{}) error {
 	val := reflect.ValueOf(context)
 	switch val.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
