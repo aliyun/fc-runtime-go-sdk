@@ -1,4 +1,4 @@
-module build-fc-zip
+module github.com/aliyun/fc-runtime-go-sdk/cmd/build-fc-zip
 
 go 1.18
 
