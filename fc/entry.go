@@ -45,6 +45,8 @@ func Start(handler interface{}) {
 //
 // Valid function signatures:
 // func (context.Context, http.ResponseWriter, *http.Request) error
+//
+// Deprecated: This method is only supported in FC 2.0 and should not be used in FC 3.0, use StartHandler instead.
 func StartHttp(handler interface{}) {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 	StartWithContext(context.Background(), handler, httpFunction)
