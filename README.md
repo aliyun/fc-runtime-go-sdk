@@ -4,7 +4,7 @@
 
 本项目是阿里云函数计算服务的 Golang 运行时的 SDK，包括使用 Golang 语言开发函数计算程序的依赖库、示例代码和一些工具。
 
-详情请参考阿里云函数计算的官方文档：[阿里云函数计算 Golang 代码开发](https://help.aliyun.com/document_detail/323505.html)
+详情请参考阿里云函数计算的官方文档：[阿里云函数计算 Golang 代码开发](https://help.aliyun.com/zh/functioncompute/fc-3-0/user-guide/go-1-2/)
 
 > 注意: Golang 运行时与 Custom-Runtime(Golang)运行时是两个不同的运行时，本项目只适用于 Golang 运行时，不可以在 Custom-Runtime 运行时使用。
 
@@ -91,4 +91,4 @@ go build -o main main.go
 ```
 
 ## 部署
-部署方法请参考官方文档 [编译部署代码包](https://help.aliyun.com/document_detail/418490.html) 。
+部署方法请参考官方文档 [编译部署代码包](https://help.aliyun.com/zh/functioncompute/fc-3-0/user-guide/compile-and-deploy-code-packages-in-a-go-runtime) 。
