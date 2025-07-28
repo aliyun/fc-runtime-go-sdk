@@ -42,6 +42,7 @@ type Object struct {
 
 type ObjectMeta struct {
 	MimeType *string `json:"mimeType"`
+	UserMeta map[string]string `json:"userMeta"`
 }
 
 type RequestParameters struct {
